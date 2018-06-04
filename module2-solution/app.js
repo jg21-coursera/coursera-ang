@@ -27,8 +27,8 @@ function ShoppingListService() {
   var service = this;
 
   service.toBuyList = [{name: "cookies", quantity: 10},
-  {name: "milk", quantity: 1},{name: "toothbrush", quantity: 2},
-  {name: "toothpaste", quantity: 1},{name: "tomato", quantity: 6}];
+  {name: "milk", quantity: 1},{name: "toothbrushes", quantity: 2},
+  {name: "toothpaste", quantity: 1},{name: "tomatoes", quantity: 6}];
 
   service.alreadyBoughtList = [];
 
