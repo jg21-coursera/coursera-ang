@@ -6,11 +6,12 @@ angular.module('MenuItemsApp', [])
 .service('MenuItemsService', MenuItemsService)
 .constant('ApiBasePath', "https://davids-restaurant.herokuapp.com");
 
-MenuItemsController.$inject = ['MenuItemsService'];
-function MenuItemsController(MenuItemsService) {
+MenuItemsController.$inject = ['$scope','MenuItemsService'];
+function MenuItemsController($scope,MenuItemsService) {
   var menu = this;
-  var description = menu.description;
-  console.log('description',description);
+  $scope.description = "";
+  menu.filteredItems=[];
+  menu.message="";
 
   var promise = MenuItemsService.getMenuItems();
 
@@ -23,21 +24,25 @@ function MenuItemsController(MenuItemsService) {
   });
 
   menu.filterMenuItems = function () {
-    console.log('description',description);
-    var filterText = description;
-    var filteredList = [];
-    if (filterText == '') {
-      filteredList = items;
-    } else {
+    menu.message="Nothing found";
+    var filterText = $scope.description;
+    menu.filteredItems=[];
+    if (filterText !== undefined && filterText !== '') {
       filterText = filterText.toLowerCase();
-      for (item in items) {
-        if (item.description.toLowerCase().indexOf(filterText) != -1) {
-          filteredList.push(item);
+      var menu_items = menu.items.menu_items;
+      for (var i = 0; i < menu_items.length; i++) {
+        var description = menu_items[i].description;
+        if (description.toLowerCase().indexOf(filterText) !== -1) {
+          menu.filteredItems.push(menu_items[i]);
         }
       }
     }
 
-    return filteredList;
+    //console.log('menu.filteredItems',menu.filteredItems);
+  };
+
+  menu.removeItem = function (itemIndex) {
+    menu.filteredItems.splice(itemIndex,1);
   };
 
   // menu.logMenuItems = function (shortName) {

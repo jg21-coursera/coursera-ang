@@ -19,11 +19,17 @@
       <button class="btn btn-primary" ng-click='menu.filterMenuItems()'>Narrow It Down For Me!</button>
     </div>
 
+    <br/><br/><br/>
     <ul>
-      <li ng-repeat="item in menu.items">
+      <li ng-repeat="item in menu.filteredItems">
+        <input type="button" value="Don't want this one!" ng-click="menu.removeItem($index)"/>
         {{ item.name }}, {{ item.short_name }} , {{ item.description }}
       </li>
     </ul>
+
+    <div ng-hide="menu.filteredItems.length">
+      {{menu.message}}
+    </div>
 
     <!-- found-items should be implemented as a component -->
     <found-items found-items="...." on-remove="...."></found-items>
