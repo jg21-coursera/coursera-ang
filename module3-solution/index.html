@@ -22,7 +22,7 @@
     <br/><br/><br/>
 
 
-    <found-items></found-items>
+    <found-items my-found="menu.found" on-remove="menu.removeItem(index)"></found-items>
 
     <div ng-hide="menu.found.length">
       {{menu.message}}

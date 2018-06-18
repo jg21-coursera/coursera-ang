@@ -1,9 +1,9 @@
 <ul>
 
-  <li ng-repeat="item in menu.found">
+  <li ng-repeat="item in found">
 
     {{ item.name }}, {{ item.short_name }} , {{ item.description }}
-    <input type="button" value="Don't want this one!" ng-click="menu.removeItem($index)"/>
+    <button ng-click="onRemove({index: $index});">Don't want this one!</button>
   </li>
 
 </ul>
