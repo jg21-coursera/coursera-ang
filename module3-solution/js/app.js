@@ -26,7 +26,6 @@ function NarrowItDownController($scope,MenuSearchService) {
     menu.getMatchedMenuItems = function () {
       var promise = MenuSearchService.getMatchedMenuItems(menu.description);
       promise.then(function (result){
-        console.log('result',result);
         menu.found= result;
         if (menu.found.length <= 0) {
           menu.message = 'Nothing found';
@@ -71,7 +70,6 @@ function MenuSearchService($http, ApiBasePath) {
           }
         }
       }
-      console.log('filteredItems',filteredItems);
 
       return filteredItems;
     },function (error){
