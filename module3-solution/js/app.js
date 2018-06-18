@@ -1,66 +1,44 @@
 (function () {
 'use strict';
 
-angular.module('MenuItemsApp', [])
-.controller('MenuItemsController', MenuItemsController)
-.service('MenuItemsService', MenuItemsService)
+angular.module('NarrowItDownApp', [])
+.controller('NarrowItDownController', NarrowItDownController)
+.service('MenuSearchService', MenuSearchService)
+.directive('foundItems',FoundItems)
 .constant('ApiBasePath', "https://davids-restaurant.herokuapp.com");
 
-MenuItemsController.$inject = ['$scope','MenuItemsService'];
-function MenuItemsController($scope,MenuItemsService) {
-  var menu = this;
-  $scope.description = "";
-  menu.filteredItems=[];
-  menu.message="";
-
-  var promise = MenuItemsService.getMenuItems();
-
-  promise.then(function (response) {
-    menu.items = response.data;
-    console.log('response',response);
-  })
-  .catch(function (error) {
-    console.log("Something went terribly wrong.");
-  });
-
-  menu.filterMenuItems = function () {
-    menu.message="Nothing found";
-    var filterText = $scope.description;
-    menu.filteredItems=[];
-    if (filterText !== undefined && filterText !== '') {
-      filterText = filterText.toLowerCase();
-      var menu_items = menu.items.menu_items;
-      for (var i = 0; i < menu_items.length; i++) {
-        var description = menu_items[i].description;
-        if (description.toLowerCase().indexOf(filterText) !== -1) {
-          menu.filteredItems.push(menu_items[i]);
-        }
-      }
-    }
-
-    //console.log('menu.filteredItems',menu.filteredItems);
+function FoundItems() {
+  var ddo = {
+    restrict:'E',
+    templateUrl: '/foundItems.html'
   };
-
-  menu.removeItem = function (itemIndex) {
-    menu.filteredItems.splice(itemIndex,1);
-  };
-
-  // menu.logMenuItems = function (shortName) {
-  //   var promise = MenuCategoriesService.getMenuForCategory(shortName);
-  //
-  //   promise.then(function (response) {
-  //     console.log(response.data);
-  //   })
-  //   .catch(function (error) {
-  //     console.log(error);
-  //   })
-  // };
-
+  return ddo;
 }
 
+NarrowItDownController.$inject = ['$scope','MenuSearchService'];
+function NarrowItDownController($scope,MenuSearchService) {
+    var menu = this;
+    //var found = [];
+    menu.getMatchedMenuItems = function () {
+      var promise = MenuSearchService.getMatchedMenuItems(menu.description);
+      promise.then(function (result){
+        console.log('result',result);
+        menu.found= result;
+        if (menu.found.length <= 0) {
+          menu.message = 'Nothing found';
+        }
+      });
+    };
 
-MenuItemsService.$inject = ['$http', 'ApiBasePath'];
-function MenuItemsService($http, ApiBasePath) {
+    menu.removeItem = function (itemIndex) {
+      menu.filteredItems.splice(itemIndex,1);
+    };
+
+  };
+
+
+MenuSearchService.$inject = ['$http', 'ApiBasePath'];
+function MenuSearchService($http, ApiBasePath) {
   var service = this;
 
   service.getMenuItems = function () {
@@ -72,18 +50,31 @@ function MenuItemsService($http, ApiBasePath) {
     return response;
   };
 
+  service.getMatchedMenuItems = function(searchTerm) {
+    var promise = service.getMenuItems();
+    return promise.then(function (response) {
+      // process result and only keep items that match
+      var foundItems = response.data;
+      var filteredItems = [];
 
-  // service.getMenuForCategory = function (shortName) {
-  //   var response = $http({
-  //     method: "GET",
-  //     url: (ApiBasePath + "/menu_items.json"),
-  //     params: {
-  //       category: shortName
-  //     }
-  //   });
-  //
-  //   return response;
-  // };
+      if (searchTerm !== undefined && searchTerm !== '') {
+        searchTerm = searchTerm.toLowerCase();
+        var menu_items = foundItems.menu_items;
+        for (var i = 0; i < menu_items.length; i++) {
+          var description = menu_items[i].description;
+          if (description.toLowerCase().indexOf(searchTerm) !== -1) {
+            filteredItems.push(menu_items[i]);
+          }
+        }
+      }
+      console.log('filteredItems',filteredItems);
+
+      // return processed items
+      return filteredItems;
+    },function (error){
+      console.log('Error occured calling HTTP Service:'+error);
+    });
+  };
 
 }
 
